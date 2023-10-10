@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract.Data
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.example.challenge3binar.databinding.FragmentDetailBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
@@ -51,13 +53,32 @@ class FragmentDetail : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setOnClickLocation()
+
+        val bundle = Bundle()
+        val food = arguments?.getParcelable<DataMenu>("DataMenu")
+        val dataFood = food as DataMenu
 //        withViewModel()
         val detailViewModel = ViewModelProvider(this).get(MyViewModel::class.java)
 
 
-        val observer = Observer<Int>{ newValue ->
-            binding.jumlahAngka.text = newValue.toString()
 
+        val observer = Observer<Int> { newValue ->
+            binding.jumlahAngka.text = newValue.toString()
+            if (binding.jumlahAngka.text.toString().toInt() != 0) {
+                binding.btnTambahKeranjang.setOnClickListener {
+                    DatabaseCart.getInstance(requireContext()).simpleChartDao.insert(
+                        DataCart(
+                            0,
+                            dataFood.nameMenu,
+                            dataFood.img,
+                            dataFood.hargaMenu.replace("[^0-9]".toRegex(), "").toInt(),
+                            binding.jumlahAngka.text.toString().toInt()
+                        )
+                    )
+
+                    findNavController().navigate(R.id.action_fragmentDetail_to_fragmentKeranjang)
+                }
+            }
         }
 
         viewModel.counter.observe(viewLifecycleOwner, observer)
@@ -73,9 +94,7 @@ class FragmentDetail : Fragment() {
 //        val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bot_nav)
 //        bottomNav.visibility = View.GONE
 
-        val bundle = Bundle()
-        val food = arguments?.getParcelable<DataMenu>("DataMenu")
-        val dataFood = food as DataMenu
+
         if(food != null){
             val gambarMenu:ImageView = binding.ivMenuDetail
             val namaMenu:TextView = binding.tvNamaMenuDetail
@@ -96,11 +115,17 @@ class FragmentDetail : Fragment() {
                 binding.btnTambahKeranjang.text = "Tambah Ke Keranjang - Rp. ${it*numericPart.toInt()}"
             }
         }
+//        Log.e("IS_GRID", binding.jumlahAngka.text.toString())
+//        binding.btnTambahKeranjang.setOnClickListener {
+//            DatabaseCart.getInstance(requireContext()).simpleChartDao.insert(DataCart(0, dataFood.nameMenu, dataFood.img, dataFood.hargaMenu.replace("[^0-9]".toRegex(), "", ).toInt(), binding.jumlahAngka.text.toString().toInt() ))
+//        }
 
-        binding.btnTambahKeranjang.setOnClickListener {
-            DatabaseCart.getInstance(requireContext()).simpleChartDao.insert(DataCart(0, dataFood.nameMenu, dataFood.img, dataFood.hargaMenu.replace("[^0-9]".toRegex(), "", ).toInt(), binding.jumlahAngka.text.toString().toInt() ))
+//        if(binding.jumlahAngka.text.toString().toInt() > 0){
+//            binding.btnTambahKeranjang.setOnClickListener {
+//                DatabaseCart.getInstance(requireContext()).simpleChartDao.insert(DataCart(0, dataFood.nameMenu, dataFood.img, dataFood.hargaMenu.replace("[^0-9]".toRegex(), "", ).toInt(), binding.jumlahAngka.text.toString().toInt() ))
+//            }
+//        }
 
-        }
 
     }
 

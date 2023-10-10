@@ -17,6 +17,6 @@ class SharedPreference(context: Context) {
                 putBoolean("IS_GRID", value)
             }
         }
-        get() = preference.getBoolean("IS_GRID", false)
+        get() = preference.getBoolean("IS_GRID", true)
 
 }
