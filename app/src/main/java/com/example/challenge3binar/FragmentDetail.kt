@@ -64,21 +64,6 @@ class FragmentDetail : Fragment() {
 
         val observer = Observer<Int> { newValue ->
             binding.jumlahAngka.text = newValue.toString()
-            if (binding.jumlahAngka.text.toString().toInt() != 0) {
-                binding.btnTambahKeranjang.setOnClickListener {
-                    DatabaseCart.getInstance(requireContext()).simpleChartDao.insert(
-                        DataCart(
-                            0,
-                            dataFood.nameMenu,
-                            dataFood.img,
-                            dataFood.hargaMenu.replace("[^0-9]".toRegex(), "").toInt(),
-                            binding.jumlahAngka.text.toString().toInt()
-                        )
-                    )
-
-//                    findNavController().navigate(R.id.action_fragmentDetail_to_fragmentKeranjang)
-                }
-            }
         }
 
         viewModel.counter.observe(viewLifecycleOwner, observer)
@@ -89,6 +74,24 @@ class FragmentDetail : Fragment() {
 
         binding.ivMinus.setOnClickListener {
             wDecrementCount()
+        }
+
+        binding.btnTambahKeranjang.setOnClickListener {
+            if (binding.jumlahAngka.text.toString().toInt() > 0) {
+                val numericPart = food?.hargaMenu?.replace("[^0-9]".toRegex(), "")
+                if (numericPart != null) {
+                    DatabaseCart.getInstance(requireContext()).simpleChartDao.insert(
+                        DataCart(
+                            0,
+                            dataFood.nameMenu,
+                            dataFood.img,
+                            numericPart.toInt(),
+                            binding.jumlahAngka.text.toString().toInt()
+                        )
+                    )
+                }
+               // findNavController().navigate(R.id.action_fragmentDetail_to_fragmentKeranjang)
+            }
         }
 
 //        val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bot_nav)

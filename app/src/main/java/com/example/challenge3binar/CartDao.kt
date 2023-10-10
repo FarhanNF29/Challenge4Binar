@@ -18,10 +18,10 @@ interface CartDao {
 
 
     @Query("DELETE FROM DATA_CART WHERE itemId = :itemIdParams")
-    fun delteByItemId(itemIdParams: Long)
+    fun deleteByItemId(itemIdParams: Int)
 
 
     @Query("UPDATE DATA_CART SET item_quantity = :newQuantity where itemId = :itemIdParams")
-    fun  updateQuantityByItemId(newQuantity: Int, itemIdParams: Long)
+    fun  updateQuantityByItemId(newQuantity: Int, itemIdParams: Int)
 
 }

@@ -5,10 +5,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.view.LayoutInflater
+import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class DataCartAdapter(private val context: Context) : RecyclerView.Adapter<DataCartAdapter.DataCartViewHolder>() {
+class DataCartAdapter(private val context: Context, private val dataCartDao: CartDao ) : RecyclerView.Adapter<DataCartAdapter.DataCartViewHolder>() {
     private var dataCartList: List<DataCart> = emptyList()
 
     inner class DataCartViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -16,6 +17,9 @@ class DataCartAdapter(private val context: Context) : RecyclerView.Adapter<DataC
         val itemImageView: ImageView = itemView.findViewById(R.id.iv_gambarMenu)
         val itemPriceTextView: TextView = itemView.findViewById(R.id.tv_hargaMenu)
         val itemQuantityTextView: TextView = itemView.findViewById(R.id.tv_jumlahMenu)
+        val btnPlus: ImageView = itemView.findViewById(R.id.iv_add2)
+        val btnMinus: ImageView = itemView.findViewById(R.id.iv_min)
+        val btnDelete: ImageView = itemView.findViewById(R.id.iv_delete)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DataCartViewHolder {
@@ -28,8 +32,32 @@ class DataCartAdapter(private val context: Context) : RecyclerView.Adapter<DataC
 
         holder.itemNameTextView.text = currentDataCart.itemName
         holder.itemImageView.setImageResource(currentDataCart.itemImage ?: R.drawable.ayam_rica)
-        holder.itemPriceTextView.text = "Rp. ${currentDataCart.itemPrice}"
         holder.itemQuantityTextView.text = "${currentDataCart.itemQuantity}"
+
+        // Menghitung harga total dan mengupdate itemPriceTextView
+        val totalPrice = currentDataCart.itemPrice?.times(currentDataCart.itemQuantity) ?: 0
+        holder.itemPriceTextView.text = "Rp. ${totalPrice}"
+
+
+        // Tombol untuk menambah quantity
+        holder.btnPlus.setOnClickListener {
+            currentDataCart.itemQuantity++
+            updateDataCart(currentDataCart)
+        }
+
+        // Tombol untuk mengurangi quantity
+        holder.btnMinus.setOnClickListener {
+            if (currentDataCart.itemQuantity > 1) { // Memeriksa bahwa itemQuantity lebih besar dari 1
+                currentDataCart.itemQuantity--
+                updateDataCart(currentDataCart)
+                notifyItemChanged(holder.adapterPosition)
+            }
+        }
+
+        // Tombol untuk menghapus item
+        holder.btnDelete.setOnClickListener {
+            deleteDataCart(currentDataCart)
+        }
     }
 
     override fun getItemCount(): Int {
@@ -39,5 +67,15 @@ class DataCartAdapter(private val context: Context) : RecyclerView.Adapter<DataC
     fun setDataCartList(dataCartList: List<DataCart>) {
         this.dataCartList = dataCartList
         notifyDataSetChanged()
+    }
+
+    private fun updateDataCart(dataCart: DataCart) {
+        // Update dataCart ke dalam database
+        dataCartDao.updateQuantityByItemId(dataCart.itemQuantity, dataCart.itemId)
+    }
+
+    private fun deleteDataCart(dataCart: DataCart) {
+        // Hapus dataCart dari database
+        dataCartDao.deleteByItemId(dataCart.itemId)
     }
 }
