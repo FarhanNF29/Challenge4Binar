@@ -80,7 +80,7 @@ class FragmentKeranjang : Fragment() {
             } else {
                 // Jika dataCartList kosong, nonaktifkan tombol atau berikan pesan kepada pengguna
                 binding.btnPesanToKonfirmasi.isEnabled = false
-                binding.btnPesanToKonfirmasi.text = "Keranjang Kosong"
+                binding.btnPesanToKonfirmasi.text = "Cart Is Empty"
             }
         })
     }

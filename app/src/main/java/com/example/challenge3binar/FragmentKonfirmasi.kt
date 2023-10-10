@@ -70,32 +70,40 @@ class FragmentKonfirmasi : Fragment() {
             // Tampilkan total harga di TextView
             val totalHargaTextView: TextView = view.findViewById(R.id.tv_ringkasanPembayaran)
             totalHargaTextView.text = "Total Harga = Rp. ${totalHarga}"
+            val btnPesanBerhasil: Button = view.findViewById(R.id.btn_pesananBerhasil)
+            // Tambahkan kondisi jika dataCartList tidak kosong
+            if (dataCartList.isNotEmpty()) {
+                // Tombol untuk berpindah ke FragmentHome
+                btnPesanBerhasil.setOnClickListener {
+                    // Simpan data pesanan ke database pesanan
+                    val pesananList = dataCartAdapter.getDataCartList()
+                    for (item in pesananList) {
+                        val orderData = OrderData(
+                            itemName = item.itemName,
+                            itemImage = item.itemImage,
+                            itemPrice = item.itemPrice,
+                            itemQuantity = item.itemQuantity
+                        )
+                        orderDao.insert(orderData)
+                    }
+
+                    // Hapus semua item di keranjang setelah pesanan berhasil
+                    dataCartDao.deleteAllItems()
+
+                    // Tampilkan pesan "Pesanan Anda Berhasil"
+                    Toast.makeText(requireContext(), "Pesanan Anda Berhasil", Toast.LENGTH_SHORT).show()
+
+                    // Navigasi ke FragmentHome
+                    findNavController().navigate(R.id.action_fragmentKonfirmasi_to_fragmentHome)
+                }
+            } else {
+                // Jika dataCartList kosong, nonaktifkan tombol atau berikan pesan kepada pengguna
+                btnPesanBerhasil.isEnabled = false
+                btnPesanBerhasil.text = "Cart Is Empty"
+            }
         })
 
-        // Tombol untuk berpindah ke FragmentHome
-        val btnPesanBerhasil: Button = view.findViewById(R.id.btn_pesananBerhasil)
-        btnPesanBerhasil.setOnClickListener {
-            // Simpan data pesanan ke database pesanan
-            val pesananList = dataCartAdapter.getDataCartList()
-            for (item in pesananList) {
-                val orderData = OrderData(
-                    itemName = item.itemName,
-                    itemImage = item.itemImage,
-                    itemPrice = item.itemPrice,
-                    itemQuantity = item.itemQuantity
-                )
-                orderDao.insert(orderData)
-            }
 
-            // Hapus semua item di keranjang setelah pesanan berhasil
-            dataCartDao.deleteAllItems()
-
-            // Tampilkan pesan "Pesanan Anda Berhasil"
-            Toast.makeText(requireContext(), "Pesanan Anda Berhasil", Toast.LENGTH_SHORT).show()
-
-            // Navigasi ke FragmentHome
-            findNavController().navigate(R.id.action_fragmentKonfirmasi_to_fragmentHome)
-        }
     }
 
     companion object {
