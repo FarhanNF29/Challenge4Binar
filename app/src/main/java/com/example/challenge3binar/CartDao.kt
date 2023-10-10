@@ -24,4 +24,7 @@ interface CartDao {
     @Query("UPDATE DATA_CART SET item_quantity = :newQuantity where itemId = :itemIdParams")
     fun  updateQuantityByItemId(newQuantity: Int, itemIdParams: Int)
 
+    @Query("DELETE FROM data_cart")
+    fun deleteAllItems()
+
 }

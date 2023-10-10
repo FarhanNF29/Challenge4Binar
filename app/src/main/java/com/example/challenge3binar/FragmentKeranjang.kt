@@ -10,6 +10,8 @@ import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.challenge3binar.databinding.FragmentKeranjangBinding
+import com.example.challenge3binar.databinding.ListKeranjangBinding
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -25,6 +27,7 @@ class FragmentKeranjang : Fragment() {
 
     private lateinit var dataCartAdapter: DataCartAdapter
     private lateinit var dataCartDao: CartDao
+    lateinit var binding: FragmentKeranjangBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -34,9 +37,10 @@ class FragmentKeranjang : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_keranjang, container, false)
+        binding = FragmentKeranjangBinding.inflate(inflater, container, false)
+        return binding.root
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -66,6 +70,18 @@ class FragmentKeranjang : Fragment() {
             // Tampilkan total harga di TextView
             val totalHargaTextView: TextView = view.findViewById(R.id.tv_totalHargaCart)
             totalHargaTextView.text = "Rp. ${totalHarga}"
+
+            // Tambahkan kondisi jika dataCartList tidak kosong
+            if (dataCartList.isNotEmpty()) {
+                binding.btnPesanToKonfirmasi.setOnClickListener {
+                    // Navigasi ke FragmentKonfirmasi
+                    findNavController().navigate(R.id.action_fragmentKeranjang_to_fragmentKonfirmasi)
+                }
+            } else {
+                // Jika dataCartList kosong, nonaktifkan tombol atau berikan pesan kepada pengguna
+                binding.btnPesanToKonfirmasi.isEnabled = false
+                binding.btnPesanToKonfirmasi.text = "Keranjang Kosong"
+            }
         })
     }
 

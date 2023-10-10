@@ -26,10 +26,23 @@
         android:id="@+id/fragmentKeranjang"
         android:name="com.example.challenge3binar.FragmentKeranjang"
         android:label="fragment_keranjang"
-        tools:layout="@layout/fragment_keranjang" />
+        tools:layout="@layout/fragment_keranjang" >
+        <action
+            android:id="@+id/action_fragmentKeranjang_to_fragmentKonfirmasi"
+            app:destination="@id/fragmentKonfirmasi" />
+    </fragment>
     <fragment
         android:id="@+id/fragmentProfile2"
         android:name="com.example.challenge3binar.FragmentProfile"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" />
+    <fragment
+        android:id="@+id/fragmentKonfirmasi"
+        android:name="com.example.challenge3binar.FragmentKonfirmasi"
+        android:label="fragment_konfirmasi"
+        tools:layout="@layout/fragment_konfirmasi" >
+        <action
+            android:id="@+id/action_fragmentKonfirmasi_to_fragmentHome"
+            app:destination="@id/fragmentHome" />
+    </fragment>
 </navigation>

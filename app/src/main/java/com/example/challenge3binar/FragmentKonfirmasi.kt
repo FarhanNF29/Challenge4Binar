@@ -5,6 +5,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
+import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -18,15 +25,12 @@ private const val ARG_PARAM2 = "param2"
  */
 class FragmentKonfirmasi : Fragment() {
     // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private lateinit var dataCartAdapter: DataCartAdapter
+    private lateinit var dataCartDao: CartDao
+    private lateinit var orderDao: OrderDao
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
     }
 
     override fun onCreateView(
@@ -37,23 +41,64 @@ class FragmentKonfirmasi : Fragment() {
         return inflater.inflate(R.layout.fragment_konfirmasi, container, false)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment FragmentKonfirmasi.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            FragmentKonfirmasi().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val recyclerView: RecyclerView = view.findViewById((R.id.recyclerView))
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        dataCartDao = DatabaseCart.getInstance(requireContext()).simpleChartDao
+        orderDao = DatabaseCart.getInstance(requireContext()).orderDao
+
+        dataCartAdapter = DataCartAdapter(requireContext(), dataCartDao)
+        recyclerView.adapter = dataCartAdapter
+
+        // Inisialisasi database
+        val database = DatabaseCart.getInstance(requireContext())
+        val dataCartDao = database.simpleChartDao
+
+        // Mengamati perubahan data dari database dan memperbarui adapter
+        dataCartDao.getAllItem().observe(viewLifecycleOwner, Observer { dataCartList ->
+            dataCartAdapter.setDataCartList(dataCartList)
+
+            // Hitung total harga dari dataCartList
+            var totalHarga = 0
+            for (item in dataCartList) {
+                val itemTotalPrice = item.itemPrice?.times(item.itemQuantity) ?: 0
+                totalHarga += itemTotalPrice
             }
+
+            // Tampilkan total harga di TextView
+            val totalHargaTextView: TextView = view.findViewById(R.id.tv_ringkasanPembayaran)
+            totalHargaTextView.text = "Total Harga = Rp. ${totalHarga}"
+        })
+
+        // Tombol untuk berpindah ke FragmentHome
+        val btnPesanBerhasil: Button = view.findViewById(R.id.btn_pesananBerhasil)
+        btnPesanBerhasil.setOnClickListener {
+            // Simpan data pesanan ke database pesanan
+            val pesananList = dataCartAdapter.getDataCartList()
+            for (item in pesananList) {
+                val orderData = OrderData(
+                    itemName = item.itemName,
+                    itemImage = item.itemImage,
+                    itemPrice = item.itemPrice,
+                    itemQuantity = item.itemQuantity
+                )
+                orderDao.insert(orderData)
+            }
+
+            // Hapus semua item di keranjang setelah pesanan berhasil
+            dataCartDao.deleteAllItems()
+
+            // Tampilkan pesan "Pesanan Anda Berhasil"
+            Toast.makeText(requireContext(), "Pesanan Anda Berhasil", Toast.LENGTH_SHORT).show()
+
+            // Navigasi ke FragmentHome
+            findNavController().navigate(R.id.action_fragmentKonfirmasi_to_fragmentHome)
+        }
+    }
+
+    companion object {
+
     }
 }

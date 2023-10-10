@@ -22,6 +22,10 @@ class DataCartAdapter(private val context: Context, private val dataCartDao: Car
         val btnDelete: ImageView = itemView.findViewById(R.id.iv_delete)
     }
 
+    fun getDataCartList(): List<DataCart> {
+        return dataCartList
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DataCartViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.list_keranjang, parent, false)
         return DataCartViewHolder(itemView)
