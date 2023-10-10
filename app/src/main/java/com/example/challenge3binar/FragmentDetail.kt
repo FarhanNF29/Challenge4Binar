@@ -76,7 +76,7 @@ class FragmentDetail : Fragment() {
                         )
                     )
 
-                    findNavController().navigate(R.id.action_fragmentDetail_to_fragmentKeranjang)
+//                    findNavController().navigate(R.id.action_fragmentDetail_to_fragmentKeranjang)
                 }
             }
         }
