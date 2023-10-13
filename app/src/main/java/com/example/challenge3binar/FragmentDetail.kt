@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
@@ -90,6 +91,8 @@ class FragmentDetail : Fragment() {
                         )
                     )
                 }
+                // Tampilkan pesan "Berhasil Menambahkan Ke Keranjang"
+                Toast.makeText(requireContext(), "Berhasil Menambahkan Ke Keranjang", Toast.LENGTH_SHORT).show()
                 //findNavController().navigate(R.id.action_fragmentDetail_to_fragmentKeranjang)
             }
         }
