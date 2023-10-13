@@ -14,5 +14,4 @@ interface OrderDao {
     @Query("SELECT * FROM order_data")
     fun getAllOrders(): LiveData<List<OrderData>>
 
-    // Tambahkan metode lain sesuai kebutuhan
 }
