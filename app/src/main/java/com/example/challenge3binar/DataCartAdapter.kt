@@ -47,6 +47,7 @@ class DataCartAdapter(private val context: Context, private val dataCartDao: Car
         holder.btnPlus.setOnClickListener {
             currentDataCart.itemQuantity++
             updateDataCart(currentDataCart)
+            notifyItemChanged(position)
         }
 
         // Tombol untuk mengurangi quantity
@@ -54,14 +55,18 @@ class DataCartAdapter(private val context: Context, private val dataCartDao: Car
             if (currentDataCart.itemQuantity > 1) { // Memeriksa bahwa itemQuantity lebih besar dari 1
                 currentDataCart.itemQuantity--
                 updateDataCart(currentDataCart)
-                notifyItemChanged(holder.adapterPosition)
+                notifyItemChanged(position)
             }
         }
+
 
         // Tombol untuk menghapus item
         holder.btnDelete.setOnClickListener {
             deleteDataCart(currentDataCart)
+            notifyItemRemoved(position)
         }
+
+
     }
 
     override fun getItemCount(): Int {
